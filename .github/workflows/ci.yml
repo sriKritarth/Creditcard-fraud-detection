@@ -38,15 +38,15 @@ jobs:
       uses: iterative/setup-cml@v2
 
     - name: Create CML report
+      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
       env:
         REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
+        run: |
           echo "## CI report" > report.md
           echo "" >> report.md
           echo "- Python: $(python --version)" >> report.md
           echo "- Linting: passed ✅" >> report.md
           echo "- Model Training: passed ✅" >> report.md
           echo "- Tests: passed ✅" >> report.md
-          # add metrics/artifacts here if you generate them
-          cml comment create report.md
+          cml comment create --target=pr report.md
     
