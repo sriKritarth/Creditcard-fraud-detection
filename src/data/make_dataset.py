@@ -21,26 +21,29 @@ def split_data(df, test_split, seed):
 
 def save_data(train, test, output_path):
     # Save the split datasets to the specified output path
-    pathlib.Path(output_path).mkdir(parents=True, exist_ok=True)
-    train.to_csv(output_path + "/train.csv", index=False)
-    test.to_csv(output_path + "/test.csv", index=False)
+    output_dir = pathlib.Path(output_path)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    train.to_csv((output_dir / "train.csv").as_posix(), index=False)
+    test.to_csv((output_dir / "test.csv").as_posix(), index=False)
 
 
 def main():
 
     curr_dir = pathlib.Path(__file__)
     home_dir = curr_dir.parent.parent.parent
-    params_file = home_dir.as_posix() + "/params.yaml"
-    params = yaml.safe_load(open(params_file))["make_dataset"]
+    params_file = home_dir / "params.yaml"
+    params = yaml.safe_load(open(params_file.as_posix()))["make_dataset"]
 
-    data_path = home_dir.as_posix() +"./data/raw/creditcard.csv"
-    output_path = home_dir.as_posix() + "/data/processed/"
+    # Accept input path from CLI; default to data/raw/creditcard.csv
+    input_arg = sys.argv[1] if len(sys.argv) > 1 else "data/raw/creditcard.csv"
+    data_path = (home_dir / input_arg)
+    output_path = (home_dir / "data" / "processed")
 
-    data = load_data(data_path)
+    data = load_data(data_path.as_posix())
     train_data, test_data = split_data(
         data, params["test_split"], params["seed"]
     )
-    save_data(train_data, test_data, output_path)
+    save_data(train_data, test_data, output_path.as_posix())
 
 
 if __name__ == "__main__":

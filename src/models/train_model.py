@@ -26,23 +26,23 @@ def main():
 
     curr_dir = pathlib.Path(__file__)
     home_dir = curr_dir.parent.parent.parent
-    params_file = home_dir.as_posix() + "/params.yaml"
-    params = yaml.safe_load(open(params_file))["train_model"]
-
-
-    data_path = home_dir.as_posix() + "./data/processed/train.csv"
-    output_path = home_dir.as_posix() + "./models"
-    pathlib.Path(output_path).mkdir(parents=True, exist_ok=True)
+    params_file = home_dir / "params.yaml"
+    params = yaml.safe_load(open(params_file.as_posix()))["train_model"]
+    # Accept input dir from CLI; default to data/processed
+    input_arg = sys.argv[1] if len(sys.argv) > 1 else "data/processed"
+    data_dir = home_dir / input_arg
+    output_path = home_dir / "models"
+    output_path.mkdir(parents=True, exist_ok=True)
 
     TARGET = "Class"
-    train_features = pd.read_csv(data_path)
+    train_features = pd.read_csv((data_dir / "train.csv").as_posix())
     X = train_features.drop(TARGET, axis=1)
     y = train_features[TARGET]
 
     trained_model = train_model(
         X, y, params["n_estimators"], params["max_depth"], params["seed"]
     )
-    save_model(trained_model, output_path)
+    save_model(trained_model, output_path.as_posix())
 
 
 if __name__ == "__main__":

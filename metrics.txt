@@ -1,0 +1,2 @@
+Final val accuracy: 9.010934838692165
+Final loss accuracy: 0.6839853516131498
